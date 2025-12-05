@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✅ කාර්ය ලැයිස්තුව සහ සතිපතා සමාලෝචනය (ප්‍රශස්තකරණය කරන ලදී)</title>
+    <title>✅ කාර්ය ලැයිස්තුව සහ සතිපතා සමාලෝචනය</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* --- CSS Styling --- */
@@ -59,39 +59,39 @@
             font-size: 1.2em;
         }
 
-        /* --- නව Input Area Styling (වෙනස් කර ඇත) --- */
+      
         .input-area {
             display: flex;
             margin-bottom: 30px; 
-            border: 2px solid var(--primary-color); /* ප්‍රධාන වර්ණයේ බෝඩරය */
+            border: 2px solid var(--primary-color);
             border-radius: 10px;
             overflow: hidden; 
-            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2); /* සෙවනැල්ල */
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
             transition: box-shadow 0.3s;
         }
 
         .input-area:focus-within {
-            box-shadow: 0 5px 20px rgba(0, 123, 255, 0.4); /* Focus කරන විට තද සෙවනැල්ල */
+            box-shadow: 0 5px 20px rgba(0, 123, 255, 0.4); 
         }
 
         #taskInput {
             flex-grow: 1;
-            /* අයිකනය සඳහා වම් පැත්තෙන් ඉඩක් තබන්න */
+           
             padding: 15px 15px 15px 50px; 
             border: none; 
             font-size: 17px;
-            /* Unicode අයිකනයක් (➕) Background Image ලෙස යෙදීම */
+           
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236c757d"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>') no-repeat 15px center;
             background-size: 20px 20px;
         }
 
         #taskInput:focus {
-            outline: none; /* පෙරනිමි focus outline එක ඉවත් කිරීම */
+            outline: none;
         }
 
         #addTaskButton {
             padding: 15px 25px; 
-            background-color: var(--primary-color); /* නිල් වර්ණය */
+            background-color: var(--primary-color); 
             color: white;
             border: none;
             cursor: pointer;
@@ -102,11 +102,11 @@
         }
 
         #addTaskButton:hover {
-            background-color: #0056b3; /* තද නිල් hover වර්ණය */
+            background-color: #0056b3; 
             transform: translateY(-1px);
         }
 
-        /* --- Task List & Chart Styling (පෙර පරිදිම පවතී) --- */
+       
         #todoList, #oldTodoList {
             list-style: none;
             padding: 0;
@@ -273,7 +273,7 @@
 <body>
 
     <div class="container">
-        <h1>🗓️ කාර්ය ලැයිස්තුව</h1>
+        <h1>🗓️ වැඩ ලැයිස්තුව</h1>
         <p>දැනුම්දීම: මකා දැමීමේ බොත්තම සක්‍රීය වන්නේ ඔබ කාර්යය ඇතුළත් කළ දිනයේදී (අද) පමණි.</p>
         
         <h2 id="currentDateHeader"></h2>
@@ -289,7 +289,7 @@
         <hr>
 
         <div id="chartArea">
-            <h2>📊 සතිපතා සාමාන්‍ය ප්‍රගතිය (රේඛා ප්‍රස්ථාරය)</h2>
+            <h2>📊 සතිපතා සාමාන්‍ය ප්‍රගතිය</h2>
             <canvas id="weeklyLineChart"></canvas>
         </div>
         
@@ -307,7 +307,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // --- ගෝලීය විචල්‍යයන් සහ තොගය (Throttling) ---
+          
             const taskInput = document.getElementById('taskInput');
             const addTaskButton = document.getElementById('addTaskButton');
             const todoList = document.getElementById('todoList');
@@ -315,18 +315,18 @@
             const weeklyChartCanvas = document.getElementById('weeklyLineChart');
             const currentDateHeader = document.getElementById('currentDateHeader');
             
-            // කාර්ය සාධනය වැඩි දියුණු කිරීම සඳහා ගෝලීය දත්ත Array
+            
             let TASKS_DATA_ARRAY = []; 
             let weeklyLineChart = null;
-            let saveTimeout = null; // Throttling සඳහා
+            let saveTimeout = null; 
             
             const TASK_STORAGE_KEY = 'final_todo_v5_tasks'; 
             const CHART_STORAGE_KEY = 'final_todo_v5_chartData'; 
-            const THROTTLE_TIME = 200; // Local Storage වෙත ලිවීම 200ms ට වරක් පමණක් සිදු කිරීමට
+            const THROTTLE_TIME = 200; 
 
             const daysOfWeekLabels = ['ඉරිදා', 'සඳුදා', 'අඟහරුවාදා', 'බදාදා', 'බ්‍රහස්පතින්දා', 'සිකුරාදා', 'සෙනසුරාදා'];
             
-            // --- Helper Functions (Date, Chart Update) ---
+           
 
             function getTodayDateString() {
                 const today = new Date();
@@ -350,7 +350,7 @@
                 element.querySelector('span').textContent = `${percentage}%`;
             }
 
-            // --- 1. Load Tasks (ගෝලීය Array භාවිතයෙන්) ---
+           
             function loadTasks() {
                 todoList.innerHTML = ''; 
                 oldTodoList.innerHTML = ''; 
@@ -375,7 +375,7 @@
                 }
             }
             
-            // --- 2. Save Tasks (Throttled Function) ---
+          
             function saveTasks() {
                 if (saveTimeout) {
                     clearTimeout(saveTimeout);
@@ -387,7 +387,7 @@
                 }, THROTTLE_TIME);
             }
 
-            // --- 3. Create Task Element ---
+         
             function createTaskElement(task, parentList, isOldTask) {
                 const listItem = document.createElement('li');
                 listItem.dataset.taskId = task.id; 
@@ -444,7 +444,7 @@
                 taskHeader.appendChild(deleteButton);
                 taskDetails.appendChild(taskHeader);
                 
-                // --- Percentage Input Area / Circular Chart ---
+               
                 const progressInputArea = document.createElement('div');
                 progressInputArea.className = 'progress-input-area';
                 
@@ -479,11 +479,11 @@
                 parentList.appendChild(listItem);
 
 
-                // --- Event Listeners (ප්‍රශස්තකරණය කරන ලදී) ---
+              
                 
                 const taskIndex = TASKS_DATA_ARRAY.findIndex(t => t.id === task.id);
 
-                // 3.1. Checkbox Listener
+               
                 checkbox.addEventListener('change', function() {
                     const isChecked = this.checked;
                     listItem.classList.toggle('completed', isChecked);
@@ -503,7 +503,7 @@
                     }
                 });
 
-                // 3.2. Progress Save Listener
+               
                 saveProgressButton.addEventListener('click', function() {
                     let percentage = parseInt(progressInput.value) || 0;
                     if (percentage < 0) percentage = 0;
@@ -517,7 +517,7 @@
                     }
                 });
 
-                // 3.3. Progress Input Keypress
+               
                  progressInput.addEventListener('keypress', function(event) {
                     if (event.key === 'Enter') {
                         saveProgressButton.click();
@@ -525,7 +525,7 @@
                 });
             }
 
-            // --- 4. Add Task ---
+           
             function addTask() {
                 const taskText = taskInput.value.trim();
 
@@ -546,7 +546,7 @@
                 }
             }
 
-            // --- 5. Chart Functions and Review Generation ---
+           
             
             function generateReview(data) {
                 const reviewElement = document.getElementById('weeklyReview');
@@ -660,7 +660,7 @@
                         responsive: true,
                         maintainAspectRatio: false,
                          animation: {
-                            duration: 500, // Animation කාලය අඩු කිරීම
+                            duration: 500, 
                         },
                         scales: {
                             y: {
@@ -685,7 +685,7 @@
                 });
             }
             
-            // --- 6. Event Handlers ---
+           
             addTaskButton.addEventListener('click', addTask);
             taskInput.addEventListener('keypress', function(event) {
                 if (event.key === 'Enter') {
@@ -693,11 +693,15 @@
                 }
             });
 
-            // --- Initial Load ---
+         
             loadTasks();
             loadChartData(); 
             updateProgressChart(); 
-        });
+        });</div>
+
+    <div id="author-footer">
+        Created by **Akidu Asmitha**
+    </div>
     </script>
 </body>
 </html>
