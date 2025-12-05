@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ කාර්ය ලැයිස්තුව සහ සතිපතා සමාලෝචනය (ප්‍රශස්තකරණය කරන ලදී)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* --- CSS Styling --- */
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --bg-light: #f8f9fa;
+            --bg-white: #ffffff;
+            --bar-color: #ffc107;
+            --old-task-bg: #e9ecef; 
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-light);
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--bg-white);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        #currentDateHeader {
+            text-align: center;
+            font-size: 1.5em;
+            color: var(--success-color);
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .old-tasks-header {
+            color: var(--secondary-color);
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            font-size: 1.2em;
+        }
+
+        /* --- නව Input Area Styling (වෙනස් කර ඇත) --- */
+        .input-area {
+            display: flex;
+            margin-bottom: 30px; 
+            border: 2px solid var(--primary-color); /* ප්‍රධාන වර්ණයේ බෝඩරය */
+            border-radius: 10px;
+            overflow: hidden; 
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2); /* සෙවනැල්ල */
+            transition: box-shadow 0.3s;
+        }
+
+        .input-area:focus-within {
+            box-shadow: 0 5px 20px rgba(0, 123, 255, 0.4); /* Focus කරන විට තද සෙවනැල්ල */
+        }
+
+        #taskInput {
+            flex-grow: 1;
+            /* අයිකනය සඳහා වම් පැත්තෙන් ඉඩක් තබන්න */
+            padding: 15px 15px 15px 50px; 
+            border: none; 
+            font-size: 17px;
+            /* Unicode අයිකනයක් (➕) Background Image ලෙස යෙදීම */
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236c757d"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>') no-repeat 15px center;
+            background-size: 20px 20px;
+        }
+
+        #taskInput:focus {
+            outline: none; /* පෙරනිමි focus outline එක ඉවත් කිරීම */
+        }
+
+        #addTaskButton {
+            padding: 15px 25px; 
+            background-color: var(--primary-color); /* නිල් වර්ණය */
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: bold;
+            border-radius: 0; 
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        #addTaskButton:hover {
+            background-color: #0056b3; /* තද නිල් hover වර්ණය */
+            transform: translateY(-1px);
+        }
+
+        /* --- Task List & Chart Styling (පෙර පරිදිම පවතී) --- */
+        #todoList, #oldTodoList {
+            list-style: none;
+            padding: 0;
+        }
+
+        #todoList li, #oldTodoList li {
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-left: 5px solid #ffc107;
+            background: #fff3cd;
+            transition: all 0.3s ease-in-out;
+        }
+
+        #oldTodoList li {
+            background: var(--old-task-bg);
+            border-left: 5px solid var(--secondary-color);
+            font-size: 0.9em;
+        }
+        
+        #todoList li.completed, #oldTodoList li.completed {
+            background: #d4edda;
+            border-left: 5px solid var(--success-color);
+        }
+        
+        .task-details {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .task-info {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap; 
+        }
+
+        .task-text {
+            margin-left: 10px;
+            font-size: 17px;
+            word-break: break-word;
+        }
+        
+        .task-added-date {
+            margin-left: 10px;
+            font-size: 0.8em;
+            color: var(--secondary-color);
+            white-space: nowrap; 
+        }
+
+        li.completed .task-text {
+            text-decoration: line-through;
+            color: var(--secondary-color);
+        }
+
+        .delete-button {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .delete-button.can-delete {
+            opacity: 1;
+        }
+        
+        .progress-input-area {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        
+        .progress-input-area input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+
+        .progress-input-area button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .circular-chart {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 9px;
+            color: #333;
+            font-weight: bold;
+            margin-left: 10px;
+            border: 2px solid #ccc; 
+            background: #f0f0f0; 
+        }
+        
+        .circular-chart span {
+            z-index: 2;
+        }
+        
+        #chartArea {
+            margin-top: 40px;
+            padding: 20px;
+            background: var(--bg-white);
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        #weeklyLineChart {
+            max-height: 300px;
+        }
+        
+        #weeklyReviewArea {
+            margin-top: 30px;
+            padding: 10px;
+        }
+
+        .review-header {
+            color: var(--primary-color);
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+            text-align: center;
+        }
+        
+        #weeklyReview {
+            background: #e6f7ff; 
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-color);
+            line-height: 1.6;
+            font-size: 1.1em;
+            white-space: pre-wrap; 
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🗓️ කාර්ය ලැයිස්තුව</h1>
+        <p>දැනුම්දීම: මකා දැමීමේ බොත්තම සක්‍රීය වන්නේ ඔබ කාර්යය ඇතුළත් කළ දිනයේදී (අද) පමණි.</p>
+        
+        <h2 id="currentDateHeader"></h2>
+        
+        <div class="input-area">
+            <input type="text" id="taskInput" placeholder="නව කාර්යය ඇතුළත් කරන්න (Enter ඔබන්න)">
+            <button id="addTaskButton">එකතු කරන්න</button>
+        </div>
+
+        <ul id="todoList">
+            </ul>
+        
+        <hr>
+
+        <div id="chartArea">
+            <h2>📊 සතිපතා සාමාන්‍ය ප්‍රගතිය (රේඛා ප්‍රස්ථාරය)</h2>
+            <canvas id="weeklyLineChart"></canvas>
+        </div>
+        
+        <div id="weeklyReviewArea">
+            <h3 class="review-header">✨ සතිපතා සමාලෝචනය සහ දිරිගැන්වීම</h3>
+            <p id="weeklyReview" class="review-content">දත්ත ලබාගත් පසු සමාලෝචනය දිස් වනු ඇත.</p>
+        </div>
+
+        <hr>
+
+        <h3 class="old-tasks-header">📦 පැරණි කාර්යයන්</h3>
+        <ul id="oldTodoList">
+            </ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- ගෝලීය විචල්‍යයන් සහ තොගය (Throttling) ---
+            const taskInput = document.getElementById('taskInput');
+            const addTaskButton = document.getElementById('addTaskButton');
+            const todoList = document.getElementById('todoList');
+            const oldTodoList = document.getElementById('oldTodoList');
+            const weeklyChartCanvas = document.getElementById('weeklyLineChart');
+            const currentDateHeader = document.getElementById('currentDateHeader');
+            
+            // කාර්ය සාධනය වැඩි දියුණු කිරීම සඳහා ගෝලීය දත්ත Array
+            let TASKS_DATA_ARRAY = []; 
+            let weeklyLineChart = null;
+            let saveTimeout = null; // Throttling සඳහා
+            
+            const TASK_STORAGE_KEY = 'final_todo_v5_tasks'; 
+            const CHART_STORAGE_KEY = 'final_todo_v5_chartData'; 
+            const THROTTLE_TIME = 200; // Local Storage වෙත ලිවීම 200ms ට වරක් පමණක් සිදු කිරීමට
+
+            const daysOfWeekLabels = ['ඉරිදා', 'සඳුදා', 'අඟහරුවාදා', 'බදාදා', 'බ්‍රහස්පතින්දා', 'සිකුරාදා', 'සෙනසුරාදා'];
+            
+            // --- Helper Functions (Date, Chart Update) ---
+
+            function getTodayDateString() {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = (today.getMonth() + 1).toString().padStart(2, '0');
+                const day = today.getDate().toString().padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+            
+            function getFormattedTodayDate() {
+                const today = new Date();
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                return today.toLocaleDateString('si-LK', options); 
+            }
+            
+            currentDateHeader.textContent = `අද දින: ${getFormattedTodayDate()}`;
+            
+            function updateCircularChart(element, percentage) {
+                const color = percentage === 100 ? getComputedStyle(document.documentElement).getPropertyValue('--success-color').trim() : getComputedStyle(document.documentElement).getPropertyValue('--bar-color').trim();
+                element.style.background = `conic-gradient(${color} ${percentage}%, #ccc ${percentage}%)`;
+                element.querySelector('span').textContent = `${percentage}%`;
+            }
+
+            // --- 1. Load Tasks (ගෝලීය Array භාවිතයෙන්) ---
+            function loadTasks() {
+                todoList.innerHTML = ''; 
+                oldTodoList.innerHTML = ''; 
+                TASKS_DATA_ARRAY = []; 
+
+                const todayDate = getTodayDateString();
+                try {
+                    const tasks = JSON.parse(localStorage.getItem(TASK_STORAGE_KEY)) || [];
+                    
+                    tasks.forEach(task => {
+                        TASKS_DATA_ARRAY.push(task); 
+                        if (task.addedDate === todayDate) {
+                            createTaskElement(task, todoList, false); 
+                        } else {
+                            createTaskElement(task, oldTodoList, true); 
+                        }
+                    });
+
+                } catch (e) {
+                    console.error("Local Storage වෙතින් Tasks පැටවීමේ දෝෂය:", e);
+                    localStorage.removeItem(TASK_STORAGE_KEY);
+                }
+            }
+            
+            // --- 2. Save Tasks (Throttled Function) ---
+            function saveTasks() {
+                if (saveTimeout) {
+                    clearTimeout(saveTimeout);
+                }
+                
+                saveTimeout = setTimeout(() => {
+                    localStorage.setItem(TASK_STORAGE_KEY, JSON.stringify(TASKS_DATA_ARRAY));
+                    saveTimeout = null;
+                }, THROTTLE_TIME);
+            }
+
+            // --- 3. Create Task Element ---
+            function createTaskElement(task, parentList, isOldTask) {
+                const listItem = document.createElement('li');
+                listItem.dataset.taskId = task.id; 
+
+                if (task.completed) {
+                    listItem.classList.add('completed');
+                }
+
+                const taskDetails = document.createElement('div');
+                taskDetails.className = 'task-details';
+
+                const taskHeader = document.createElement('div');
+                taskHeader.className = 'task-header';
+
+                const taskInfo = document.createElement('div');
+                taskInfo.className = 'task-info';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = task.completed;
+                taskInfo.appendChild(checkbox);
+
+                const taskSpan = document.createElement('span');
+                taskSpan.className = 'task-text';
+                taskSpan.textContent = task.text;
+                taskInfo.appendChild(taskSpan);
+                
+                if (isOldTask) {
+                    const dateSpan = document.createElement('span');
+                    dateSpan.className = 'task-added-date';
+                    dateSpan.textContent = `(ඇතුළත් කළේ: ${task.addedDate})`;
+                    taskInfo.appendChild(dateSpan);
+                }
+
+                taskHeader.appendChild(taskInfo);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-button';
+                deleteButton.innerHTML = '✖ මකන්න';
+
+                if (task.addedDate === getTodayDateString()) {
+                    deleteButton.classList.add('can-delete');
+                    deleteButton.onclick = function() {
+                        TASKS_DATA_ARRAY = TASKS_DATA_ARRAY.filter(t => t.id !== task.id);
+                        parentList.removeChild(listItem); 
+                        saveTasks(); 
+                        updateProgressChart(); 
+                    };
+                } else {
+                    deleteButton.disabled = true;
+                    deleteButton.title = `මෙය ඇතුළත් කළ දිනය ${task.addedDate}. මකා දැමිය හැක්කේ අද දිනට පමණි.`;
+                }
+                
+                taskHeader.appendChild(deleteButton);
+                taskDetails.appendChild(taskHeader);
+                
+                // --- Percentage Input Area / Circular Chart ---
+                const progressInputArea = document.createElement('div');
+                progressInputArea.className = 'progress-input-area';
+                
+                const progressText = document.createElement('span');
+                progressText.textContent = 'ප්‍රගතිය (%):';
+                progressInputArea.appendChild(progressText);
+
+                const progressInput = document.createElement('input');
+                progressInput.type = 'number';
+                progressInput.min = 0;
+                progressInput.max = 100;
+                progressInput.value = task.percentage || 0;
+                progressInput.disabled = !task.completed; 
+                progressInputArea.appendChild(progressInput);
+
+                const saveProgressButton = document.createElement('button');
+                saveProgressButton.textContent = 'ගබඩා කරන්න';
+                saveProgressButton.disabled = !task.completed;
+                
+                const circularChart = document.createElement('div');
+                circularChart.className = 'circular-chart';
+                const chartText = document.createElement('span');
+                circularChart.appendChild(chartText);
+
+                updateCircularChart(circularChart, task.percentage || 0);
+
+                progressInputArea.appendChild(saveProgressButton);
+                progressInputArea.appendChild(circularChart);
+                taskDetails.appendChild(progressInputArea);
+
+                listItem.appendChild(taskDetails);
+                parentList.appendChild(listItem);
+
+
+                // --- Event Listeners (ප්‍රශස්තකරණය කරන ලදී) ---
+                
+                const taskIndex = TASKS_DATA_ARRAY.findIndex(t => t.id === task.id);
+
+                // 3.1. Checkbox Listener
+                checkbox.addEventListener('change', function() {
+                    const isChecked = this.checked;
+                    listItem.classList.toggle('completed', isChecked);
+                    
+                    progressInput.disabled = !isChecked;
+                    saveProgressButton.disabled = !isChecked;
+                    
+                    if (taskIndex !== -1) {
+                        TASKS_DATA_ARRAY[taskIndex].completed = isChecked;
+                        if (!isChecked) {
+                            TASKS_DATA_ARRAY[taskIndex].percentage = 0;
+                            progressInput.value = 0;
+                        } 
+                        updateCircularChart(circularChart, TASKS_DATA_ARRAY[taskIndex].percentage);
+                        saveTasks(); 
+                        updateProgressChart(); 
+                    }
+                });
+
+                // 3.2. Progress Save Listener
+                saveProgressButton.addEventListener('click', function() {
+                    let percentage = parseInt(progressInput.value) || 0;
+                    if (percentage < 0) percentage = 0;
+                    if (percentage > 100) percentage = 100;
+
+                    if (taskIndex !== -1) {
+                        TASKS_DATA_ARRAY[taskIndex].percentage = percentage;
+                        updateCircularChart(circularChart, percentage);
+                        saveTasks(); 
+                        updateProgressChart(); 
+                    }
+                });
+
+                // 3.3. Progress Input Keypress
+                 progressInput.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        saveProgressButton.click();
+                    }
+                });
+            }
+
+            // --- 4. Add Task ---
+            function addTask() {
+                const taskText = taskInput.value.trim();
+
+                if (taskText !== "") {
+                    const newTask = {
+                        id: Date.now(), 
+                        text: taskText,
+                        completed: false,
+                        percentage: 0,
+                        addedDate: getTodayDateString() 
+                    };
+
+                    TASKS_DATA_ARRAY.push(newTask); 
+                    createTaskElement(newTask, todoList, false); 
+                    saveTasks(); 
+                    taskInput.value = ''; 
+                    taskInput.focus();
+                }
+            }
+
+            // --- 5. Chart Functions and Review Generation ---
+            
+            function generateReview(data) {
+                const reviewElement = document.getElementById('weeklyReview');
+                const totalPercentage = data.reduce((sum, value) => sum + value, 0);
+                const average = Math.round(totalPercentage / 7); 
+
+                let message = "";
+                let emoji = "";
+
+                if (average >= 90) {
+                    emoji = "🤩 විශිෂ්ටයි!";
+                    message = `**සුපිරි වැඩක්!** මේ සතියේ ඔබේ සාමාන්‍ය ප්‍රගතිය **${average}%** කි. ඔබ කාර්යයන් නියමිත වේලාවට අවසන් කිරීමේදී විශිෂ්ට ස්ථාවරත්වයක් පෙන්වා ඇත. මෙය ඉතා ඉහළ සාර්ථකත්වයක්! ඉදිරියටත් මේ අයුරින්ම යන්න, දවසින් දවස ඔබ දියුණු වෙනවා!`;
+                } else if (average >= 70) {
+                    emoji = "👍 ඉතා හොඳයි!";
+                    message = `**ඉතා හොඳයි!** ඔබේ සාමාන්‍ය ප්‍රගතිය **${average}%** කි. ඔබ අඛණ්ඩව හොඳ උත්සාහයක් දරන බව පැහැදිලියි. ස්ථාවරව වැඩ කිරීම විශාල දියුණුවක් පෙන්නුම් කරයි. තවත් සුළු උත්සාහයකින් ඊළඟ මට්ටමට යා හැකියි! විශාල කාර්යයන් කුඩා කොටස්වලට කඩා දිනකට එකක් හෝ දෙකක් නිම කරන්න.`;
+                } else if (average >= 50) {
+                    emoji = "🧠 හොඳ ආරම්භයක්!";
+                    message = `**හොඳ ආරම්භයක්!** සතියේ සාමාන්‍ය ප්‍රගතිය **${average}%** කි. ඔබ වැඩ කරනවා, ඒත් තව ටිකක් අවධානය දෙන්න පුළුවන්. ඔබේ සැලසුම්කරණය (Planning) දියුණු කරන්න බලන්න. සෑම දිනකම අවම වශයෙන් එක් කාර්යයක් හෝ සම්පූර්ණ කිරීමට ඉලක්කයක් තබා ගන්න. මතක තබා ගන්න, අඛණ්ඩතාව ජයග්‍රහණයේ රහසයි!`;
+                } else if (average > 0) {
+                    emoji = "🤔 වැඩි දියුණු කළ යුතුයි.";
+                    message = `**වැඩි දියුණු කළ යුතුයි.** මේ සතියේ ඔබේ සාමාන්‍ය ප්‍රගතිය **${average}%** දක්වා අඩු වී තිබෙනවා. සමහරවිට කාර්යයන් වැඩියි, නැත්නම් වැඩ පටන් ගන්න අමාරු ඇති. ඔබේ දවසට කුඩා, කළමනාකරණය කළ හැකි කාර්යයන් එකතු කරන්න. අදම පටන් ගන්න! "මම මේ සතිය හොඳට කළා" කියන හැඟීම ඇති කරගන්න උත්සාහ කරන්න.`;
+                } else {
+                    emoji = "🌟 අපි පටන් ගමු!";
+                    message = `**අපි පටන් ගමු!** මේ සතියේ කිසිදු ප්‍රගතියක් සටහන් වී නැහැ. කාර්යයන් ඇතුළත් කර, ඒවා අවසන් කර ප්‍රගතිය සටහන් කරන්න. සෑම විශාල ගමනක්ම ආරම්භ වන්නේ කුඩා පළමු පියවරකිනි. අදම ඔබේ පළමු කාර්යය ඇතුළත් කර අවසන් කරන්න. ඔබට පුළුවන්!`;
+                }
+
+                reviewElement.innerHTML = `${message}`;
+                reviewElement.previousElementSibling.textContent = `${emoji} සතිපතා සමාලෝචනය සහ දිරිගැන්වීම`; 
+            }
+
+            function loadChartData() {
+                const defaultData = [0, 0, 0, 0, 0, 0, 0]; 
+                try {
+                    const storedData = JSON.parse(localStorage.getItem(CHART_STORAGE_KEY)) || {};
+                    let chartDataArray = [...defaultData];
+                    
+                    for (let i = 0; i < 7; i++) {
+                        if (storedData[i] !== undefined) {
+                            chartDataArray[i] = storedData[i];
+                        }
+                    }
+                    renderChart(chartDataArray);
+                    generateReview(chartDataArray); 
+                    return storedData; 
+                } catch (e) {
+                    console.error("Chart data loading error:", e);
+                    localStorage.removeItem(CHART_STORAGE_KEY);
+                    renderChart(defaultData);
+                    generateReview(defaultData);
+                    return {};
+                }
+            }
+
+            function saveChartData(chartDataObject) {
+                localStorage.setItem(CHART_STORAGE_KEY, JSON.stringify(chartDataObject));
+            }
+
+            function updateProgressChart() {
+                const today = new Date();
+                const dayIndex = today.getDay(); 
+
+                let chartDataObj = loadChartData(); 
+                const completedTasks = TASKS_DATA_ARRAY.filter(t => t.completed); 
+                
+                let totalPercentage = 0;
+                let taskCount = completedTasks.length;
+
+                completedTasks.forEach(t => { totalPercentage += t.percentage; });
+
+                const averagePercentage = taskCount > 0 ? Math.round(totalPercentage / taskCount) : 0;
+                
+                chartDataObj[dayIndex] = averagePercentage;
+                
+                saveChartData(chartDataObj); 
+                
+                let chartDataArray = new Array(7).fill(0);
+                for (let i = 0; i < 7; i++) {
+                     if (chartDataObj[i] !== undefined) {
+                        chartDataArray[i] = chartDataObj[i];
+                    }
+                }
+                renderChart(chartDataArray); 
+                generateReview(chartDataArray); 
+            }
+            
+            function renderChart(data) {
+                const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
+                
+                if (weeklyLineChart) {
+                    weeklyLineChart.data.datasets[0].data = data;
+                    weeklyLineChart.update();
+                    return;
+                }
+
+                weeklyLineChart = new Chart(weeklyChartCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: daysOfWeekLabels,
+                        datasets: [{
+                            label: 'දෛනික සාමාන්‍ය ප්‍රගතිය (%)',
+                            data: data,
+                            borderColor: primaryColor,
+                            backgroundColor: primaryColor + '10', 
+                            fill: true,
+                            tension: 0.4, 
+                            pointBackgroundColor: primaryColor,
+                            pointRadius: 5,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                         animation: {
+                            duration: 500, // Animation කාලය අඩු කිරීම
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: 'ප්‍රගතිය (%)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            },
+                            title: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // --- 6. Event Handlers ---
+            addTaskButton.addEventListener('click', addTask);
+            taskInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    addTask();
+                }
+            });
+
+            // --- Initial Load ---
+            loadTasks();
+            loadChartData(); 
+            updateProgressChart(); 
+        });
+    </script>
+</body>
+</html>
