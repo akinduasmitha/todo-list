@@ -1,799 +1,273 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✅ හෙට දිනය ප්ලෑන් කරමු</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daily Flow APK - Task Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
-       
         :root {
-            --primary-color: #007bff;
-            --secondary-color: #6c757d;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --bg-light: #f8f9fa;
-            --bg-white: #ffffff;
-            --bar-color: #ffc107;
-            --old-task-bg: #e9ecef; 
+            --bg-color: #f3f4f6;
+            --app-bg: rgba(255, 255, 255, 0.9);
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --accent-color: #f43f5e;
+            --success-color: #10b981;
+            --border-color: rgba(226, 232, 240, 0.8);
+            --input-bg: #ffffff;
         }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --app-bg: rgba(30, 41, 59, 0.8);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --primary-color: #818cf8;
+            --border-color: rgba(51, 65, 85, 0.8);
+            --input-bg: rgba(15, 23, 42, 0.6);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: var(--bg-light);
+            background: var(--bg-color);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 800px;
-            background: var(--bg-white);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-        }
-        
-        #currentDateHeader {
-            text-align: center;
-            font-size: 1.5em;
-            color: var(--success-color);
-            margin-bottom: 15px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-        }
-        
-        .old-tasks-header {
-            color: var(--secondary-color);
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 5px;
-            margin-top: 30px;
-            font-size: 1.2em;
-        }
-
-       
-        .input-area {
-            display: flex;
-            margin-bottom: 30px; 
-            border: 2px solid var(--primary-color); 
-            border-radius: 10px;
-            overflow: hidden; 
-            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2); 
-            transition: box-shadow 0.3s;
-        }
-
-        .input-area:focus-within {
-            box-shadow: 0 5px 20px rgba(0, 123, 255, 0.4); 
-        }
-
-        #taskInput {
-            flex-grow: 1;
-            
-            padding: 15px 15px 15px 50px; 
-            border: none; 
-            font-size: 17px;
-          
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236c757d"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>') no-repeat 15px center;
-            background-size: 20px 20px;
-        }
-
-        #taskInput:focus {
-            outline: none; 
-        }
-
-        #addTaskButton {
-            padding: 15px 25px; 
-            background-color: var(--primary-color); 
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 17px;
-            font-weight: bold;
-            border-radius: 0; 
-            transition: background-color 0.2s, transform 0.1s;
-        }
-
-        #addTaskButton:hover {
-            background-color: #0056b3; 
-            transform: translateY(-1px);
-        }
-
-        
-        #todoList, #oldTodoList {
-            list-style: none;
-            padding: 0;
-        }
-
-        #todoList li, #oldTodoList li {
-            padding: 15px;
-            margin-bottom: 12px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
             align-items: flex-start;
-            border-left: 5px solid #ffc107;
-            background: #fff3cd;
-            transition: all 0.3s ease-in-out;
+            padding: 10px;
+            color: var(--text-primary);
+            overflow-x: hidden;
         }
 
-        #oldTodoList li {
-            background: var(--old-task-bg);
-            border-left: 5px solid var(--secondary-color);
-            font-size: 0.9em;
-        }
-        
-        #todoList li.completed, #oldTodoList li.completed {
-            background: #d4edda;
-            border-left: 5px solid var(--success-color);
-        }
-        
-        .task-details {
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            background: var(--app-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 1.2rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
-            flex-grow: 1;
-        }
-
-        .task-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 5px;
-        }
-
-        .task-info {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap; 
-        }
-
-        .task-text {
-            margin-left: 10px;
-            font-size: 17px;
-            word-break: break-word;
-        }
-        
-        .task-added-date {
-            margin-left: 10px;
-            font-size: 0.8em;
-            color: var(--secondary-color);
-            white-space: nowrap; 
-        }
-
-        li.completed .task-text {
-            text-decoration: line-through;
-            color: var(--secondary-color);
-        }
-
-        .delete-button {
-            background: var(--danger-color);
-            color: white;
-            border: none;
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            margin-left: 10px;
-            opacity: 0.6;
-            transition: opacity 0.2s;
-        }
-
-        .delete-button.can-delete {
-            opacity: 1;
-        }
-        
-        .progress-input-area {
-            display: flex;
-            align-items: center;
+            gap: 1.2rem;
             margin-top: 10px;
-            padding: 8px;
-            background-color: #e9ecef;
-            border-radius: 4px;
-        }
-        
-        .progress-input-area input[type="number"] {
-            width: 60px;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-right: 5px;
         }
 
-        .progress-input-area button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+        .app-header { display: flex; justify-content: space-between; align-items: center; }
+        .app-header h1 { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); }
+        .date-display { color: var(--text-secondary); font-size: 0.85rem; }
 
-        .circular-chart {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: grid;
-            place-items: center;
-            font-size: 9px;
-            color: #333;
-            font-weight: bold;
-            margin-left: 10px;
-            border: 2px solid #ccc; 
-            background: #f0f0f0; 
-        }
-        
-        .circular-chart span {
-            z-index: 2;
-        }
-        
-        #chartArea {
-            margin-top: 40px;
-            padding: 20px;
-            background: var(--bg-white);
-            border-radius: 12px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-
-        #weeklyLineChart {
-            max-height: 300px;
-        }
-        
-        #weeklyReviewArea {
-            margin-top: 30px;
+        .chart-wrapper {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
             padding: 10px;
+            height: 180px;
         }
 
-        .review-header {
-            color: var(--primary-color);
-            margin-top: 20px;
-            margin-bottom: 10px;
-            font-size: 1.3em;
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-card {
+            background: var(--input-bg);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
             text-align: center;
         }
-        
-        #weeklyReview {
-            background: #e6f7ff; 
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 5px solid var(--primary-color);
-            line-height: 1.6;
-            font-size: 1.1em;
-            white-space: pre-wrap; 
-            font-weight: 500;
+        .stat-value { font-size: 1.2rem; font-weight: 700; display: block; }
+        .stat-label { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; }
+
+        .input-group { display: flex; gap: 8px; }
+        #taskInput {
+            flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);
+            background: var(--input-bg); color: var(--text-primary); outline: none;
         }
+        .add-btn {
+            background: var(--primary-color); color: white; border: none;
+            padding: 0 15px; border-radius: 12px; cursor: pointer;
+        }
+
+        .task-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .task-item {
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            padding: 12px; border-radius: 15px; display: flex; flex-direction: column; gap: 8px;
+        }
+        .task-top { display: flex; justify-content: space-between; align-items: center; }
+        .task-text { font-weight: 500; font-size: 0.95rem; flex: 1; }
+        
+        .progress-row { display: flex; align-items: center; gap: 10px; }
+        .slider { flex: 1; height: 6px; border-radius: 5px; cursor: pointer; }
+        .percent-tag { font-weight: 700; font-size: 0.85rem; min-width: 40px; color: var(--primary-color); }
+
+        .lock-badge { font-size: 0.7rem; background: #fee2e2; color: #ef4444; padding: 2px 6px; border-radius: 4px; }
+        .delete-btn { color: var(--text-secondary); border: none; background: none; font-size: 1rem; cursor: pointer; }
+
+        /* Scrollbar */
+        .task-list { max-height: 300px; overflow-y: auto; padding-right: 5px; }
     </style>
 </head>
-<body>
+<body data-theme="light">
+    <div class="app-container">
+        <header class="app-header">
+            <div>
+                <h1>Daily Flow</h1>
+                <p class="date-display" id="dateDisplay"></p>
+            </div>
+            <button id="themeToggle" style="background:none; border:none; font-size: 1.2rem; cursor:pointer;">🌙</button>
+        </header>
 
-    <div class="container">
-        <h1>🗓️ හෙට දිනය ප්ලෑන් කරමු</h1>
-        <h2>Created by Akidu Asmitha</h2>
-        <p>දැනුම්දීම: කාර්යයක් ඇතුළත් කළ විට, එය ක්‍රියාත්මක වන දිනය ලෙස හෙට දිනය සටහන් වේ. **හරි ලකුණ දැමිය හැක්කේ ක්‍රියාත්මක වන දිනයේ (හෙට) පමණි.** **ක්‍රියාත්මක වන දිනය පසු වූ පසු, නොකළ කාර්යයන්ට නැවත හරි ලකුණු දැමිය නොහැක.** මකා දැමීමේ බොත්තම සක්‍රීය වන්නේ ඇතුළත් කළ දිනයේදී (අද) පමණි.</p>
-        
-        <h2 id="currentDateHeader"></h2>
-        
-        <div class="input-area">
-            <input type="text" id="taskInput" placeholder="නව කාර්යය ඇතුළත් කරන්න (Enter ඔබන්න)">
-            <button id="addTaskButton">එකතු කරන්න</button>
+        <div class="chart-wrapper">
+            <canvas id="mainChart"></canvas>
         </div>
 
-        <ul id="todoList">
-            </ul>
-        
-        <hr>
-
-        <div id="chartArea">
-            <h2>📊 සතිපතා සාමාන්‍ය ප්‍රගතිය </h2>
-            <canvas id="weeklyLineChart"></canvas>
-        </div>
-        
-        <div id="weeklyReviewArea">
-            <h3 class="review-header">✨ සතිපතා සමාලෝචනය සහ දිරිගැන්වීම</h3>
-            <p id="weeklyReview" class="review-content">දත්ත ලබාගත් පසු සමාලෝචනය දිස් වනු ඇත.</p>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-value" id="pendingCount">0</span>
+                <span class="stat-label">Pending</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="avgProgress">0%</span>
+                <span class="stat-label">Today's Avg</span>
+            </div>
         </div>
 
-        <hr>
+        <div class="input-group">
+            <input type="text" id="taskInput" placeholder="Add task for today...">
+            <button id="addTaskBtn" class="add-btn"><i class="fas fa-plus"></i></button>
+        </div>
 
-        <h3 class="old-tasks-header">📦 පැරණි කාර්යයන්</h3>
-        <ul id="oldTodoList">
-            </ul>
+        <ul class="task-list" id="taskList"></ul>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // --- ගෝලීය විචල්‍යයන් සහ තොගය (Throttling) ---
-            const taskInput = document.getElementById('taskInput');
-            const addTaskButton = document.getElementById('addTaskButton');
-            const todoList = document.getElementById('todoList');
-            const oldTodoList = document.getElementById('oldTodoList');
-            const weeklyChartCanvas = document.getElementById('weeklyLineChart');
-            const currentDateHeader = document.getElementById('currentDateHeader');
+        const getToday = () => new Date().toISOString().split('T')[0];
+        let tasks = JSON.parse(localStorage.getItem('daily_flow_apk')) || [];
+        let myChart = null;
+
+        function save() {
+            localStorage.setItem('daily_flow_apk', JSON.stringify(tasks));
+            render();
+            updateChart();
+        }
+
+        function addTask() {
+            const val = document.getElementById('taskInput').value.trim();
+            if(!val) return;
+            tasks.unshift({ id: Date.now(), text: val, progress: 0, date: getToday() });
+            document.getElementById('taskInput').value = '';
+            save();
+        }
+
+        function render() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            const today = getToday();
             
-            // කාර්ය සාධනය වැඩි දියුණු කිරීම සඳහා ගෝලීය දත්ත Array
-            let TASKS_DATA_ARRAY = []; 
-            let weeklyLineChart = null;
-            let saveTimeout = null; // Throttling සඳහා
-            
-            const TASK_STORAGE_KEY = 'final_todo_v5_tasks'; 
-            const CHART_STORAGE_KEY = 'final_todo_v5_chartData'; 
-            const THROTTLE_TIME = 200; // Local Storage වෙත ලිවීම 200ms ට වරක් පමණක් සිදු කිරීමට
+            let pending = 0;
+            let todayTotal = 0;
+            let todayCount = 0;
 
-            const daysOfWeekLabels = ['ඉරිදා', 'සඳුදා', 'අඟහරුවාදා', 'බදාදා', 'බ්‍රහස්පතින්දා', 'සිකුරාදා', 'සෙනසුරාදා'];
-            
-            // --- Helper Functions (Date, Chart Update) ---
-
-            function getTodayDateString() {
-                const today = new Date();
-                const year = today.getFullYear();
-                const month = (today.getMonth() + 1).toString().padStart(2, '0');
-                const day = today.getDate().toString().padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            }
-
-            function getNextDayDateString() {
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1); // දවසක් එකතු කිරීම
-                const year = tomorrow.getFullYear();
-                const month = (tomorrow.getMonth() + 1).toString().padStart(2, '0');
-                const day = tomorrow.getDate().toString().padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            }
-            
-            function getFormattedTodayDate() {
-                const today = new Date();
-                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                return today.toLocaleDateString('si-LK', options); 
-            }
-            
-            currentDateHeader.textContent = `අද දින: ${getFormattedTodayDate()}`;
-            
-            function updateCircularChart(element, percentage) {
-                const color = percentage === 100 ? getComputedStyle(document.documentElement).getPropertyValue('--success-color').trim() : getComputedStyle(document.documentElement).getPropertyValue('--bar-color').trim();
-                element.style.background = `conic-gradient(${color} ${percentage}%, #ccc ${percentage}%)`;
-                element.querySelector('span').textContent = `${percentage}%`;
-            }
-
-            // --- 1. Load Tasks (ගෝලීය Array භාවිතයෙන්) ---
-            function loadTasks() {
-                todoList.innerHTML = ''; 
-                oldTodoList.innerHTML = ''; 
-                TASKS_DATA_ARRAY = []; 
-
-                const todayDate = getTodayDateString();
-                try {
-                    const tasks = JSON.parse(localStorage.getItem(TASK_STORAGE_KEY)) || [];
-                    
-                    tasks.forEach(task => {
-                        TASKS_DATA_ARRAY.push(task); 
-                        // addedDate අද දිනට හෝ ඊට වැඩි නම්, එය අද ලැයිස්තුවේ පෙන්වයි.
-                        if (task.addedDate >= todayDate) { 
-                             createTaskElement(task, todoList, false); 
-                        } else {
-                            // addedDate ඊට වඩා පැරණි නම්, එය පැරණි ලැයිස්තුවට යයි.
-                            createTaskElement(task, oldTodoList, true); 
-                        }
-                    });
-
-                } catch (e) {
-                    console.error("Local Storage වෙතින් Tasks පැටවීමේ දෝෂය:", e);
-                    localStorage.removeItem(TASK_STORAGE_KEY);
-                }
-            }
-            
-            // --- 2. Save Tasks (Throttled Function) ---
-            function saveTasks() {
-                if (saveTimeout) {
-                    clearTimeout(saveTimeout);
-                }
-                
-                saveTimeout = setTimeout(() => {
-                    localStorage.setItem(TASK_STORAGE_KEY, JSON.stringify(TASKS_DATA_ARRAY));
-                    saveTimeout = null;
-                }, THROTTLE_TIME);
-            }
-
-            // --- 3. Create Task Element ---
-            function createTaskElement(task, parentList, isOldTask) {
-                const listItem = document.createElement('li');
-                listItem.dataset.taskId = task.id; 
-
-                if (task.completed) {
-                    listItem.classList.add('completed');
+            tasks.forEach(t => {
+                const isToday = t.date === today;
+                if(isToday) {
+                    todayCount++;
+                    todayTotal += parseInt(t.progress);
+                    if(t.progress < 100) pending++;
                 }
 
-                const taskDetails = document.createElement('div');
-                taskDetails.className = 'task-details';
-
-                const taskHeader = document.createElement('div');
-                taskHeader.className = 'task-header';
-
-                const taskInfo = document.createElement('div');
-                taskInfo.className = 'task-info';
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = task.completed;
-                taskInfo.appendChild(checkbox);
-                
-                // ************************************************
-                // ** සංශෝධනය 1: Checkbox සක්‍රීය/අක්‍රීය කිරීම (සංශෝධිත) **
-                // ************************************************
-                const todayDate = getTodayDateString();
-                const isExecutableToday = task.addedDate === todayDate; 
-                const isPastExecutionDate = task.addedDate < todayDate; // addedDate අදට වඩා පැරණිද
-                
-                // කාර්යය සම්පූර්ණ කළ හැක්කේ එය ක්‍රියාත්මක විය යුතු (addedDate) දිනයේදී පමණි.
-                // addedDate දිනය පසු වී ඇත්නම්, හෝ addedDate අද නොවේ නම්, 
-                // තවමත් සම්පූර්ණ කර නැති කාර්යයක් නම්, එය disabled කරන්න.
-                if (!task.completed && (isPastExecutionDate || !isExecutableToday)) {
-                    checkbox.disabled = true;
-                    
-                    if (isPastExecutionDate) {
-                        checkbox.title = `මෙය කල් ඉකුත් වී ඇත (${task.addedDate}). මෙය තවදුරටත් සම්පූර්ණ කළ නොහැක.`;
-                    } else {
-                        checkbox.title = `මෙය සම්පූර්ණ කළ හැක්කේ ක්‍රියාත්මක වන දිනයේ (${task.addedDate}) පමණි.`;
-                    }
-                }
-                // ************************************************
-
-
-                const taskSpan = document.createElement('span');
-                taskSpan.className = 'task-text';
-                taskSpan.textContent = task.text;
-                taskInfo.appendChild(taskSpan);
-                
-                // ඇතුළත් කළ දිනය පෙන්වීම
-                if (isOldTask || task.addedDate === getNextDayDateString()) {
-                    const dateSpan = document.createElement('span');
-                    dateSpan.className = 'task-added-date';
-                    
-                    if (task.addedDate === getNextDayDateString() && !isOldTask) {
-                        dateSpan.textContent = `(ක්‍රියාත්මක වන්නේ හෙට: ${task.addedDate})`;
-                    } else {
-                        dateSpan.textContent = `(ක්‍රියාත්මක විය යුතු දිනය: ${task.addedDate})`;
-                    }
-                    taskInfo.appendChild(dateSpan);
-                }
-
-                taskHeader.appendChild(taskInfo);
-
-                const deleteButton = document.createElement('button');
-                deleteButton.className = 'delete-button';
-                deleteButton.innerHTML = '✖ මකන්න';
-
-                // මකා දැමීම අද දිනට (එනම් addedDate හෙට නම්) පමණක් සීමා කිරීම
-                if (task.addedDate === getNextDayDateString()) { 
-                    deleteButton.classList.add('can-delete');
-                    deleteButton.onclick = function() {
-                        TASKS_DATA_ARRAY = TASKS_DATA_ARRAY.filter(t => t.id !== task.id);
-                        parentList.removeChild(listItem); 
-                        saveTasks(); 
-                        updateProgressChart(); 
-                    };
-                } else {
-                    deleteButton.disabled = true;
-                    deleteButton.title = `මෙය ඇතුළත් කළ දිනය ${task.addedDate}. මකා දැමිය හැක්කේ එය ඇතුළත් කළ දිනට (ඊයේ දිනයට) පමණි.`;
-                }
-                
-                taskHeader.appendChild(deleteButton);
-                taskDetails.appendChild(taskHeader);
-                
-                // --- Percentage Input Area / Circular Chart ---
-                const progressInputArea = document.createElement('div');
-                progressInputArea.className = 'progress-input-area';
-                
-                const progressText = document.createElement('span');
-                progressText.textContent = 'ප්‍රගතිය (%):';
-                progressInputArea.appendChild(progressText);
-
-                const progressInput = document.createElement('input');
-                progressInput.type = 'number';
-                progressInput.min = 0;
-                progressInput.max = 100;
-                progressInput.value = task.percentage || 0;
-                
-                // ************************************************
-                // ** සංශෝධනය 2: Progress Input සක්‍රීය/අක්‍රීය කිරීම **
-                // ************************************************
-                // Checkbox එකට සමාන තාර්කිකත්වයක් යෙදීම:
-                progressInput.disabled = !task.completed || isPastExecutionDate || !isExecutableToday; 
-                progressInputArea.appendChild(progressInput);
-
-                const saveProgressButton = document.createElement('button');
-                saveProgressButton.textContent = 'ගබඩා කරන්න';
-                
-                // ************************************************
-                // ** සංශෝධනය 3: Save Button සක්‍රීය/අක්‍රීය කිරීම **
-                // ************************************************
-                // Checkbox එකට සමාන තාර්කිකත්වයක් යෙදීම:
-                saveProgressButton.disabled = !task.completed || isPastExecutionDate || !isExecutableToday;
-                
-                const circularChart = document.createElement('div');
-                circularChart.className = 'circular-chart';
-                const chartText = document.createElement('span');
-                circularChart.appendChild(chartText);
-
-                updateCircularChart(circularChart, task.percentage || 0);
-
-                progressInputArea.appendChild(saveProgressButton);
-                progressInputArea.appendChild(circularChart);
-                taskDetails.appendChild(progressInputArea);
-
-                listItem.appendChild(taskDetails);
-                parentList.appendChild(listItem);
-
-
-                // --- Event Listeners (ප්‍රශස්තකරණය කරන ලදී) ---
-                
-                const taskIndex = TASKS_DATA_ARRAY.findIndex(t => t.id === task.id);
-
-                // 3.1. Checkbox Listener
-                checkbox.addEventListener('change', function() {
-                    if (checkbox.disabled) return; // දැනටමත් disabled නම් කිසිවක් නොකරන්න
-
-                    const isChecked = this.checked;
-                    listItem.classList.toggle('completed', isChecked);
-                    
-                    // Checkbox තත්වයට අනුව progress input සක්‍රීය/අක්‍රීය කිරීම
-                    progressInput.disabled = !isChecked;
-                    saveProgressButton.disabled = !isChecked;
-                    
-                    if (taskIndex !== -1) {
-                        TASKS_DATA_ARRAY[taskIndex].completed = isChecked;
-                        if (!isChecked) {
-                            TASKS_DATA_ARRAY[taskIndex].percentage = 0;
-                            progressInput.value = 0;
-                        } 
-                        updateCircularChart(circularChart, TASKS_DATA_ARRAY[taskIndex].percentage);
-                        saveTasks(); 
-                        updateProgressChart(); 
-                    }
-                });
-
-                // 3.2. Progress Save Listener
-                saveProgressButton.addEventListener('click', function() {
-                    if (saveProgressButton.disabled) return;
-
-                    let percentage = parseInt(progressInput.value) || 0;
-                    if (percentage < 0) percentage = 0;
-                    if (percentage > 100) percentage = 100;
-
-                    if (taskIndex !== -1) {
-                        TASKS_DATA_ARRAY[taskIndex].percentage = percentage;
-                        updateCircularChart(circularChart, percentage);
-                        saveTasks(); 
-                        updateProgressChart(); 
-                    }
-                });
-
-                // 3.3. Progress Input Keypress
-                 progressInput.addEventListener('keypress', function(event) {
-                    if (event.key === 'Enter') {
-                        saveProgressButton.click();
-                    }
-                });
-            }
-
-            // --- 4. Add Task ---
-            function addTask() {
-                const taskText = taskInput.value.trim();
-
-                if (taskText !== "") {
-                    const newTask = {
-                        id: Date.now(), 
-                        text: taskText,
-                        completed: false,
-                        percentage: 0,
-                        addedDate: getNextDayDateString() // හෙට දිනය සටහන් කිරීම
-                    };
-
-                    TASKS_DATA_ARRAY.push(newTask); 
-                    createTaskElement(newTask, todoList, false); 
-                    saveTasks(); 
-                    taskInput.value = ''; 
-                    taskInput.focus();
-                }
-            }
-
-            // --- 5. Chart Functions and Review Generation ---
-            
-            // ************************************************
-            // ** සංශෝධනය 4: සමාලෝචන පණිවිඩ විශාල ප්‍රමාණයක් එක් කිරීම **
-            // ************************************************
-            const reviewMessages = {
-                'excellent': [
-                    { emoji: "🤩 විශිෂ්ටයි!", message: "**සුපිරි වැඩක්!** මේ සතියේ ඔබේ සාමාන්‍ය ප්‍රගතිය **{average}%** කි. ඔබ කාර්යයන් නියමිත වේලාවට අවසන් කිරීමේදී විශිෂ්ට ස්ථාවරත්වයක් පෙන්වා ඇත. මෙය ඉතා ඉහළ සාර්ථකත්වයක්! ඉදිරියටත් මේ අයුරින්ම යන්න, දවසින් දවස ඔබ දියුණු වෙනවා!" },
-                    { emoji: "🏆 ජයග්‍රහණය!", message: "**නියමයි!** ඔබ **{average}%**ක ඉලක්කයක් සමඟින් සතිය අවසන් කර ඇත. ඔබගේ කාර්යයන් කෙරෙහි වූ අවධානය ප්‍රශංසනීයයි. මෙම සාර්ථකත්වය රඳවා ගන්න. ඔබේ දෛනික සැලසුම් තව දුරටත් ප්‍රශස්ත කරන්න." },
-                    { emoji: "🚀 ඉහළම තත්වය!", message: "**ඉහළම ප්‍රගතිය!** ඔබේ **{average}%** සාමාන්‍යය පෙන්නුම් කරන්නේ ඔබ විශාල ප්‍රගතියක් ලබා ඇති බවයි. කුඩා පියවර විශාල වෙනසක් කරයි. ඔබේ ඊළඟ ඉලක්කයන් කුමක්ද? ඒවා වෙත යන්න!" },
-                    { emoji: "✨ ආදර්ශමත්!", message: "**ඉතාමත් ආදර්ශමත්!** **{average}%**ක සාර්ථකත්වයක් ලබා ගැනීම සැබවින්ම දිරිගන්වන සුළුයි. ඔබේ වැඩ කිරීමේ වේගය සහ ගුණාත්මකභාවය තවදුරටත් වර්ධනය කරන්න. ඔබ අන් අයට ආදර්ශයක්!" },
-                ],
-                'good': [
-                    { emoji: "👍 ඉතා හොඳයි!", message: "**ඉතා හොඳයි!** ඔබේ සාමාන්‍ය ප්‍රගතිය **{average}%** කි. ඔබ අඛණ්ඩව හොඳ උත්සාහයක් දරන බව පැහැදිලියි. ස්ථාවරව වැඩ කිරීම විශාල දියුණුවක් පෙන්නුම් කරයි. තවත් සුළු උත්සාහයකින් ඊළඟ මට්ටමට යා හැකියි! විශාල කාර්යයන් කුඩා කොටස්වලට කඩා දිනකට එකක් හෝ දෙකක් නිම කරන්න." },
-                    { emoji: "🌟 ස්ථාවරයි!", message: "**ස්ථාවර ප්‍රගතියක්!** **{average}%**ක ප්‍රගතියක් යනු ඔබ නිවැරදි මාර්ගයේ ගමන් කරන බවයි. ඔබේ අවධානය ඉලක්කයෙන් ඉවතට නොගොස් තබා ගන්න. ඊළඟ සතියේ 5%කින් මෙය වැඩි කිරීමට උත්සාහ කරන්න!" },
-                    { emoji: "💪 හොඳ උත්සාහයක්!", message: "**හොඳ උත්සාහයක්!** ඔබ **{average}%**ක ප්‍රගතියක් සටහන් කර තිබේ. මෙය ශක්තිමත් පදනමකි. කාල කළමනාකරණය තවදුරටත් දියුණු කර ගන්නේ කෙසේදැයි සිතා බලන්න. ඔබේ දවසේ කාර්යයන් ප්‍රමුඛතා අනුව ලැයිස්තුගත කරන්න." },
-                    { emoji: "📈 වර්ධනය!", message: "**හොඳ වර්ධනයක්!** **{average}%**ක සාමාන්‍යය ඉතා දිරිගන්වන සුළුය. ඔබගේ දින සැලසුම් කිරීමේදී, වඩාත් අභියෝගාත්මක කාර්යයන් උදෑසන අවසන් කිරීමට උත්සාහ කරන්න. මෙම හොඳ පුරුදු ඉදිරියට ගෙන යන්න." },
-                ],
-                'fair': [
-                    { emoji: "🧠 හොඳ ආරම්භයක්!", message: "**හොඳ ආරම්භයක්!** සතියේ සාමාන්‍ය ප්‍රගතිය **{average}%** කි. ඔබ වැඩ කරනවා, ඒත් තව ටිකක් අවධානය දෙන්න පුළුවන්. ඔබේ සැලසුම්කරණය (Planning) දියුණු කරන්න බලන්න. සෑම දිනකම අවම වශයෙන් එක් කාර්යයක් හෝ සම්පූර්ණ කිරීමට ඉලක්කයක් තබා ගන්න. මතක තබා ගන්න, අඛණ්ඩතාව ජයග්‍රහණයේ රහසයි!" },
-                    { emoji: "🚦 අවධානය යොමු කරන්න.", message: "**සාමාන්‍ය තත්වය.** **{average}%**ක ප්‍රගතියක් සමඟ, ඔබට වේගය වැඩි කිරීමට හැකියාව ඇත. ප්‍රමාද වීමට හේතු හඳුනාගෙන ඒවා නිවැරදි කරන්න. සෑම කාර්යයක්ම සක්‍රීයව අවසන් කිරීමට උත්සාහ කරන්න." },
-                    { emoji: "🔄 නැවත සලකා බලන්න.", message: "**සැලසුම් සමාලෝචනය.** සතිය අවසන් වන්නේ **{average}%**ක සාමාන්‍යයකිනි. ඔබ කාර්යයන් ආරම්භ කළා, නමුත් ඒවා අවසන් කිරීමට වැඩි උත්සාහයක් අවශ්‍යයි. ඊළඟ සතියේ ඉලක්ක ඉතා යථාර්ථවාදී ලෙස සකසා ගන්න." },
-                    { emoji: "💡 පොඩි වෙනසක්.", message: "**කුඩා වෙනසක් අවශ්‍යයි.** **{average}%**ක ප්‍රගතියක් යනු ඔබගේ වැඩ කටයුතු අතරමැද නතර වූ බවකි. කාර්යයන් ඉතා විශාල නම්, ඒවා බිඳ දමන්න (Breakdown). එකවරම සියල්ල කිරීමට උත්සාහ නොකරන්න." },
-                ],
-                'poor': [
-                    { emoji: "🤔 වැඩි දියුණු කළ යුතුයි.", message: "**වැඩි දියුණු කළ යුතුයි.** මේ සතියේ ඔබේ සාමාන්‍ය ප්‍රගතිය **{average}%** දක්වා අඩු වී තිබෙනවා. සමහරවිට කාර්යයන් වැඩියි, නැත්නම් වැඩ පටන් ගන්න අමාරු ඇති. ඔබේ දවසට කුඩා, කළමනාකරණය කළ හැකි කාර්යයන් එකතු කරන්න. අදම පටන් ගන්න! 'මම මේ සතිය හොඳට කළා' කියන හැඟීම ඇති කරගන්න උත්සාහ කරන්න." },
-                    { emoji: "🛑 නැවතිලා.", message: "**ඔබේ ප්‍රගතිය නැවතිලා.** **{average}%**ක අඩු ප්‍රගතියක් සටහන් වී ඇත. මේ සතිය අමතක කරලා අලුතින් පටන් ගන්න. ඔබ වඩාත් කැමති කාර්යයන් වලින් පටන් ගැනීමෙන් වැඩ කිරීමේ පුරුද්ද ගොඩනගා ගන්න." },
-                    { emoji: "⚠️ අනතුරු ඇඟවීම.", message: "**අවධානය!** සතිපතා සාමාන්‍යය **{average}%** කි. ඔබගේ ඉලක්ක සපුරා ගැනීම සඳහා විශාල කැපවීමක් අවශ්‍යයි. ඔබේ මුළු ශක්තියම යොදවා වැඩ කරන්න. ඔබට කළ නොහැකි දෙයක් නැත!" },
-                    { emoji: "📉 පහළයි.", message: "**ඉතා පහළ ප්‍රගතිය.** **{average}%** යනු ඔබගේ සතිය ඵලදායී නොවන බවයි. මෙම දුර්වලතා හඳුනාගෙන, ඒවා ඉක්මනින් නිවැරදි කරන්න. දිනපතා අවම වශයෙන් විනාඩි 15ක් හෝ වැඩ කරන්න." },
-                ],
-                'zero': [
-                    { emoji: "🌟 අපි පටන් ගමු!", message: "**අපි පටන් ගමු!** මේ සතියේ කිසිදු ප්‍රගතියක් සටහන් වී නැහැ. කාර්යයන් ඇතුළත් කර, ඒවා අවසන් කර ප්‍රගතිය සටහන් කරන්න. සෑම විශාල ගමනක්ම ආරම්භ වන්නේ කුඩා පළමු පියවරකිනි. අදම ඔබේ පළමු කාර්යය ඇතුළත් කර අවසන් කරන්න. ඔබට පුළුවන්!" },
-                    { emoji: "💤 නිහැඬියාව.", message: "**සතිය නිහඬයි.** ප්‍රගතිය 0% කි. මෙය වෙනස් කළ හැකියි! හෙට දිනයේදී අවම වශයෙන් එක් දෙයක්වත් සම්පූර්ණ කරන්නට පොරොන්දු වන්න. කුඩා ආරම්භයක් විශාල වෙනසකට මඟ පාදයි." },
-                    { emoji: "🆕 අලුත් අවස්ථාවක්!", message: "**අලුත් අවස්ථාවක්!** 0%ක ප්‍රගතිය ගැන දුක් නොවන්න. සෑම දිනක්ම නව ආරම්භයකි. ඔබට වැදගත් වන කාර්යයන් තුනක් ලැයිස්තුගත කර ඒවා අද අවසන් කරන්න. යන්න, වැඩේ පටන් ගන්න!" },
-                ]
-            };
-            
-            function getRandomMessage(category, average) {
-                const messages = reviewMessages[category];
-                const selected = messages[Math.floor(Math.random() * messages.length)];
-                // {average} placeholder එක ප්‍රතිස්ථාපනය කිරීම
-                return { 
-                    emoji: selected.emoji, 
-                    message: selected.message.replace('{average}', average) 
-                };
-            }
-            
-            function generateReview(data) {
-                const reviewElement = document.getElementById('weeklyReview');
-                const totalPercentage = data.reduce((sum, value) => sum + value, 0);
-                const average = Math.round(totalPercentage / 7); 
-
-                let result;
-
-                if (average >= 90) {
-                    result = getRandomMessage('excellent', average);
-                } else if (average >= 70) {
-                    result = getRandomMessage('good', average);
-                } else if (average >= 50) {
-                    result = getRandomMessage('fair', average);
-                } else if (average > 0) {
-                    result = getRandomMessage('poor', average);
-                } else {
-                    result = getRandomMessage('zero', average);
-                }
-
-                reviewElement.innerHTML = `${result.message}`;
-                reviewElement.previousElementSibling.textContent = `${result.emoji} සතිපතා සමාලෝචනය සහ දිරිගැන්වීම`; 
-            }
-            // ************************************************
-
-            function loadChartData() {
-                const defaultData = [0, 0, 0, 0, 0, 0, 0]; 
-                try {
-                    const storedData = JSON.parse(localStorage.getItem(CHART_STORAGE_KEY)) || {};
-                    let chartDataArray = [...defaultData];
-                    
-                    for (let i = 0; i < 7; i++) {
-                        if (storedData[i] !== undefined) {
-                            chartDataArray[i] = storedData[i];
-                        }
-                    }
-                    renderChart(chartDataArray);
-                    generateReview(chartDataArray); 
-                    return storedData; 
-                } catch (e) {
-                    console.error("Chart data loading error:", e);
-                    localStorage.removeItem(CHART_STORAGE_KEY);
-                    renderChart(defaultData);
-                    generateReview(defaultData);
-                    return {};
-                }
-            }
-
-            function saveChartData(chartDataObject) {
-                localStorage.setItem(CHART_STORAGE_KEY, JSON.stringify(chartDataObject));
-            }
-
-            function updateProgressChart() {
-                const today = new Date();
-                const dayIndex = today.getDay(); 
-
-                let chartDataObj = loadChartData(); 
-                const completedTasks = TASKS_DATA_ARRAY.filter(t => t.completed); 
-                
-                let totalPercentage = 0;
-                let taskCount = completedTasks.length;
-
-                completedTasks.forEach(t => { totalPercentage += t.percentage; });
-
-                const averagePercentage = taskCount > 0 ? Math.round(totalPercentage / taskCount) : 0;
-                
-                chartDataObj[dayIndex] = averagePercentage;
-                
-                saveChartData(chartDataObj); 
-                
-                let chartDataArray = new Array(7).fill(0);
-                for (let i = 0; i < 7; i++) {
-                     if (chartDataObj[i] !== undefined) {
-                        chartDataArray[i] = chartDataObj[i];
-                    }
-                }
-                renderChart(chartDataArray); 
-                generateReview(chartDataArray); 
-            }
-            
-            function renderChart(data) {
-                const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
-                
-                if (weeklyLineChart) {
-                    weeklyLineChart.data.datasets[0].data = data;
-                    weeklyLineChart.update();
-                    return;
-                }
-
-                weeklyLineChart = new Chart(weeklyChartCanvas, {
-                    type: 'line',
-                    data: {
-                        labels: daysOfWeekLabels,
-                        datasets: [{
-                            label: 'දෛනික සාමාන්‍ය ප්‍රගතිය (%)',
-                            data: data,
-                            borderColor: primaryColor,
-                            backgroundColor: primaryColor + '10', 
-                            fill: true,
-                            tension: 0.4, 
-                            pointBackgroundColor: primaryColor,
-                            pointRadius: 5,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                         animation: {
-                            duration: 500, // Animation කාලය අඩු කිරීම
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 100,
-                                title: {
-                                    display: true,
-                                    text: 'ප්‍රගතිය (%)'
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top',
-                            },
-                            title: {
-                                display: false
-                            }
-                        }
-                    }
-                });
-            }
-            
-            // --- 6. Event Handlers ---
-            addTaskButton.addEventListener('click', addTask);
-            taskInput.addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    addTask();
-                }
+                const li = document.createElement('li');
+                li.className = 'task-item';
+                li.innerHTML = `
+                    <div class="task-top">
+                        <span class="task-text">${t.text}</span>
+                        <div>
+                            ${!isToday ? '<span class="lock-badge">Locked</span>' : ''}
+                            <button class="delete-btn" onclick="deleteTask(${t.id})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="progress-row">
+                        <input type="range" class="slider" value="${t.progress}" 
+                            ${!isToday ? 'disabled' : ''} 
+                            oninput="updateProgress(${t.id}, this.value)">
+                        <span class="percent-tag">${t.progress}%</span>
+                    </div>
+                `;
+                list.appendChild(li);
             });
 
-            // --- Initial Load ---
-            loadTasks();
-            loadChartData(); 
-            updateProgressChart(); 
-        });
+            document.getElementById('pendingCount').innerText = pending;
+            document.getElementById('avgProgress').innerText = todayCount > 0 ? Math.round(todayTotal/todayCount) + '%' : '0%';
+            document.getElementById('dateDisplay').innerText = new Date().toDateString();
+        }
+
+        function updateProgress(id, val) {
+            const task = tasks.find(t => t.id === id);
+            if(task && task.date === getToday()) {
+                task.progress = val;
+                localStorage.setItem('daily_flow_apk', JSON.stringify(tasks));
+                // Update text without full re-render for smooth sliding
+                render(); 
+                updateChart();
+            }
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            save();
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            const last7Days = [...Array(7)].map((_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                return d.toISOString().split('T')[0];
+            }).reverse();
+
+            const chartData = last7Days.map(date => {
+                const dayTasks = tasks.filter(t => t.date === date);
+                if(dayTasks.length === 0) return 0;
+                return Math.round(dayTasks.reduce((acc, t) => acc + parseInt(t.progress), 0) / dayTasks.length);
+            });
+
+            if(myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: last7Days.map(d => d.split('-')[2]),
+                    datasets: [{
+                        label: 'Progress %',
+                        data: chartData,
+                        borderColor: '#6366f1',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { min: 0, max: 100 } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        document.getElementById('addTaskBtn').onclick = addTask;
+        document.getElementById('themeToggle').onclick = () => {
+            const body = document.body;
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.getElementById('themeToggle').innerText = isDark ? '🌙' : '☀️';
+        };
+
+        render();
+        updateChart();
     </script>
 </body>
 </html>
